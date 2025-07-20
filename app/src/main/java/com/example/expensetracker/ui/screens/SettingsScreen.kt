@@ -12,6 +12,7 @@ import androidx.navigation.NavController
 import com.example.expensetracker.ui.viewmodel.SettingsUiState
 import com.example.expensetracker.ui.viewmodel.SettingsViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.expensetracker.ui.components.ErrorState
 
 @Composable
 fun SettingsScreen(
@@ -101,9 +102,8 @@ fun SettingsScreen(
                     }
                 }
                 if (uiState is SettingsUiState.Error) {
-                    Text(
-                        text = uiState.message,
-                        color = MaterialTheme.colorScheme.error,
+                    ErrorState(
+                        message = uiState.message,
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
