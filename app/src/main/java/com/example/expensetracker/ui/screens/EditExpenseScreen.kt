@@ -21,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import com.example.expensetracker.ui.components.ErrorState
 
 @Composable
 fun EditExpenseScreen(
@@ -129,9 +130,8 @@ fun EditExpenseScreen(
                     Text("Delete Expense")
                 }
                 if (uiState is AddExpenseUiState.Error) {
-                    Text(
-                        text = uiState.message,
-                        color = MaterialTheme.colorScheme.error,
+                    ErrorState(
+                        message = uiState.message,
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
