@@ -14,6 +14,7 @@ import androidx.navigation.NavController
 import com.example.expensetracker.ui.viewmodel.AnalyticsUiState
 import com.example.expensetracker.ui.viewmodel.AnalyticsViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.expensetracker.ui.components.ErrorState
 
 @Composable
 fun AnalyticsScreen(
@@ -39,9 +40,8 @@ fun AnalyticsScreen(
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
                 is AnalyticsUiState.Error -> {
-                    Text(
-                        text = uiState.message,
-                        color = MaterialTheme.colorScheme.error,
+                    ErrorState(
+                        message = uiState.message,
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
