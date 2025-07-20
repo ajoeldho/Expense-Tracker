@@ -18,6 +18,8 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import com.example.expensetracker.ui.components.EmptyState
+import com.example.expensetracker.ui.components.ErrorState
 
 @Composable
 fun ExpenseListScreen(
@@ -70,16 +72,15 @@ fun ExpenseListScreen(
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                     }
                     is ExpenseListUiState.Error -> {
-                        Text(
-                            text = uiState.message,
-                            color = MaterialTheme.colorScheme.error,
+                        ErrorState(
+                            message = uiState.message,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
                     is ExpenseListUiState.Success -> {
                         if (uiState.expenses.isEmpty()) {
-                            Text(
-                                text = "No expenses found.",
+                            EmptyState(
+                                message = "No expenses found.",
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
                             )
                         } else {
