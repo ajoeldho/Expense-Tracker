@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import com.example.expensetracker.ui.viewmodel.AuthUiState
 import com.example.expensetracker.ui.viewmodel.AuthViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.expensetracker.ui.components.ErrorState
 
 @Composable
 fun LockScreen(
@@ -66,10 +67,8 @@ fun LockScreen(
                 isError = error != null
             )
             if (error != null) {
-                Text(
-                    text = error!!,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
+                ErrorState(
+                    message = error!!,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
