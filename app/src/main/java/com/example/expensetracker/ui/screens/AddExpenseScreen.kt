@@ -21,6 +21,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import com.example.expensetracker.ui.components.ErrorState
 
 @Composable
 fun AddExpenseScreen(
@@ -113,9 +114,8 @@ fun AddExpenseScreen(
                     Text("Save Expense")
                 }
                 if (uiState is AddExpenseUiState.Error) {
-                    Text(
-                        text = uiState.message,
-                        color = MaterialTheme.colorScheme.error,
+                    ErrorState(
+                        message = uiState.message,
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
