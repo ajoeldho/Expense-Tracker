@@ -1,0 +1,305 @@
+Expense Tracker - System Architecture Design
+Architecture Overview
+The Expense Tracker follows Clean Architecture principles with clear separation of concerns across three main layers: Presentation, Domain, and Data. This ensures testability, maintainability, and adherence to SOLID principles.
+Key Architectural Principles Applied:
+1.	Dependency Inversion: Higher-level modules don't depend on lower-level modules
+2.	Single Responsibility: Each class has one reason to change
+3.	Open/Closed: Open for extension, closed for modification
+4.	Interface Segregation: Clients shouldn't depend on interfaces they don't use
+5.	Liskov Substitution: Objects should be replaceable with instances of their subtypes
+________________________________________
+High-Level Architecture Layers
+1. Presentation Layer (UI)
+•	Jetpack Compose UI components
+•	ViewModels for UI state management
+•	UI State classes for screen states
+•	Navigation handling
+2. Domain Layer (Business Logic)
+•	Use Cases (Interactors) for business operations
+•	Domain Models (Entities)
+•	Repository Interfaces (contracts)
+•	Business Rules & Validation
+3. Data Layer (Storage & External APIs)
+•	Repository Implementations
+•	Room Database with DAOs
+•	Data Sources (Local)
+•	Data Models with mappers
+•	Security components (Keystore, Biometric)
+________________________________________
+Component Breakdown
+Presentation Layer Components
+ViewModels
+•	HomeViewModel - Dashboard state management
+•	AddExpenseViewModel - Expense entry/editing
+•	ExpenseListViewModel - List display and filtering
+•	SettingsViewModel - App settings and preferences
+•	AuthViewModel - PIN/biometric authentication
+UI State Classes
+data class HomeUiState(
+    val todayExpenses: Double = 0.0,
+    val weeklyExpenses: Double = 0.0,
+    val monthlyExpenses: Double = 0.0,
+    val recentExpenses: List<ExpenseUi> = emptyList(),
+    val isLoading: Boolean = false,
+    val error: String? = null
+)
+
+data class ExpenseListUiState(
+    val expenses: List<ExpenseUi> = emptyList(),
+    val selectedPeriod: TimePeriod = TimePeriod.TODAY,
+    val totalAmount: Double = 0.0,
+    val isLoading: Boolean = false
+)
+Compose Screens
+•	HomeScreen - Dashboard with summaries
+•	AddExpenseScreen - Expense input form
+•	ExpenseListScreen - Filterable expense list
+•	SettingsScreen - App configuration
+•	AuthScreen - PIN/biometric entry
+Domain Layer Components
+Use Cases (Business Operations)
+•	AddExpenseUseCase - Add new expense with validation
+•	EditExpenseUseCase - Modify existing expense
+•	DeleteExpenseUseCase - Remove expense
+•	GetExpensesUseCase - Retrieve expenses with filters
+•	GetExpenseSummaryUseCase - Calculate summaries
+•	ValidateExpenseUseCase - Business rule validation
+•	AuthenticateUserUseCase - Handle authentication
+•	ManageSettingsUseCase - App preferences
+Domain Models
+data class Expense(
+    val id: Long = 0,
+    val amount: Double,
+    val category: Category,
+    val note: String?,
+    val timestamp: LocalDateTime
+)
+
+data class Category(
+    val id: Long,
+    val name: String,
+    val icon: String
+)
+
+enum class TimePeriod { TODAY, WEEK, MONTH }
+Repository Interfaces
+interface ExpenseRepository {
+    suspend fun addExpense(expense: Expense): Result<Long>
+    suspend fun updateExpense(expense: Expense): Result<Unit>
+    suspend fun deleteExpense(id: Long): Result<Unit>
+    suspend fun getExpenses(period: TimePeriod): Flow<List<Expense>>
+    suspend fun getExpenseSummary(period: TimePeriod): Flow<ExpenseSummary>
+}
+
+interface SettingsRepository {
+    suspend fun getThemeMode(): Flow<ThemeMode>
+    suspend fun setThemeMode(mode: ThemeMode)
+    suspend fun isAppLocked(): Flow<Boolean>
+    suspend fun setAppLock(enabled: Boolean)
+}
+Data Layer Components
+Room Database
+@Database(
+    entities = [ExpenseEntity::class, CategoryEntity::class],
+    version = 1,
+    exportSchema = false
+)
+abstract class ExpenseDatabase : RoomDatabase() {
+    abstract fun expenseDao(): ExpenseDao
+    abstract fun categoryDao(): CategoryDao
+}
+DAOs (Data Access Objects)
+@Dao
+interface ExpenseDao {
+    @Query("SELECT * FROM expenses ORDER BY timestamp DESC")
+    fun getAllExpenses(): Flow<List<ExpenseEntity>>
+    
+    @Query("SELECT * FROM expenses WHERE date(timestamp/1000, 'unixepoch') = date('now')")
+    fun getTodayExpenses(): Flow<List<ExpenseEntity>>
+    
+    @Insert
+    suspend fun insertExpense(expense: ExpenseEntity): Long
+    
+    @Update
+    suspend fun updateExpense(expense: ExpenseEntity)
+    
+    @Delete
+    suspend fun deleteExpense(expense: ExpenseEntity)
+}
+Repository Implementations
+class ExpenseRepositoryImpl(
+    private val expenseDao: ExpenseDao,
+    private val categoryDao: CategoryDao,
+    private val expenseMapper: ExpenseMapper
+) : ExpenseRepository {
+    
+    override suspend fun addExpense(expense: Expense): Result<Long> {
+        return try {
+            val entity = expenseMapper.toEntity(expense)
+            val id = expenseDao.insertExpense(entity)
+            Result.success(id)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    // Other implementations...
+}
+Data Models & Mappers
+@Entity(tableName = "expenses")
+data class ExpenseEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    val amount: Double,
+    val categoryId: Long,
+    val note: String?,
+    val timestamp: Long
+)
+
+class ExpenseMapper {
+    fun toDomain(entity: ExpenseEntity, category: Category): Expense {
+        return Expense(
+            id = entity.id,
+            amount = entity.amount,
+            category = category,
+            note = entity.note,
+            timestamp = LocalDateTime.ofEpochSecond(entity.timestamp, 0, ZoneOffset.UTC)
+        )
+    }
+    
+    fun toEntity(domain: Expense): ExpenseEntity {
+        return ExpenseEntity(
+            id = domain.id,
+            amount = domain.amount,
+            categoryId = domain.category.id,
+            note = domain.note,
+            timestamp = domain.timestamp.toEpochSecond(ZoneOffset.UTC)
+        )
+    }
+}
+________________________________________
+Dependency Injection Setup
+Hilt Modules
+Database Module
+@Module
+@InstallIn(SingletonComponent::class)
+object DatabaseModule {
+    
+    @Provides
+    @Singleton
+    fun provideExpenseDatabase(@ApplicationContext context: Context): ExpenseDatabase {
+        return Room.databaseBuilder(
+            context,
+            ExpenseDatabase::class.java,
+            "expense_database"
+        ).build()
+    }
+    
+    @Provides
+    fun provideExpenseDao(database: ExpenseDatabase): ExpenseDao = database.expenseDao()
+}
+Repository Module
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class RepositoryModule {
+    
+    @Binds
+    abstract fun bindExpenseRepository(
+        expenseRepositoryImpl: ExpenseRepositoryImpl
+    ): ExpenseRepository
+    
+    @Binds
+    abstract fun bindSettingsRepository(
+        settingsRepositoryImpl: SettingsRepositoryImpl
+    ): SettingsRepository
+}
+________________________________________
+Security Architecture
+Authentication Flow
+1.	App Launch → Check if app lock enabled
+2.	PIN/Biometric → Authenticate using Android Keystore
+3.	Session Management → Maintain authenticated state
+4.	Background/Foreground → Re-authenticate when app returns
+Security Components
+interface AuthenticationManager {
+    suspend fun authenticateWithPin(pin: String): Result<Boolean>
+    suspend fun authenticateWithBiometric(): Result<Boolean>
+    suspend fun isAuthenticated(): Boolean
+    suspend fun logout()
+}
+
+class SecureStorageManager(
+    private val keystore: AndroidKeystore
+) {
+    suspend fun storePinHash(pinHash: String)
+    suspend fun getPinHash(): String?
+    suspend fun clearCredentials()
+}
+________________________________________
+Testing Strategy
+Unit Tests
+•	Domain Layer: Use Cases, Business Logic
+•	ViewModels: UI State Management
+•	Repositories: Data operations
+Integration Tests
+•	Database: Room DAO operations
+•	Repository: End-to-end data flow
+UI Tests
+•	Compose: Screen interactions
+•	Navigation: Flow between screens
+Test Doubles
+class FakeExpenseRepository : ExpenseRepository {
+    private val expenses = mutableListOf<Expense>()
+    
+    override suspend fun addExpense(expense: Expense): Result<Long> {
+        expenses.add(expense.copy(id = expenses.size + 1L))
+        return Result.success(expenses.size.toLong())
+    }
+    
+    override suspend fun getExpenses(period: TimePeriod): Flow<List<Expense>> {
+        return flowOf(expenses.filter { /* filter by period */ })
+    }
+}
+________________________________________
+Performance Considerations
+Database Optimization
+•	Indexing on frequently queried columns (timestamp, categoryId)
+•	Paging for large expense lists
+•	Database migrations for schema changes
+Memory Management
+•	Flow-based reactive data streams
+•	Lazy loading of expensive operations
+•	Proper lifecycle awareness in ViewModels
+UI Performance
+•	Compose optimization with proper state management
+•	List performance with keys and stable data
+•	Theme switching without recreation
+________________________________________
+Error Handling Strategy
+Result Pattern
+sealed class Result<out T> {
+    data class Success<T>(val data: T) : Result<T>()
+    data class Error(val exception: Exception) : Result<Nothing>()
+}
+Error States in UI
+data class UiState<T>(
+    val data: T? = null,
+    val isLoading: Boolean = false,
+    val error: String? = null
+) {
+    val isSuccess: Boolean get() = data != null && error == null
+    val isError: Boolean get() = error != null
+}
+________________________________________
+Future Scalability
+Modularization Strategy
+•	Feature modules: :expense, :settings, :auth
+•	Core modules: :database, :network, :common
+•	App module: Main application and navigation
+Extension Points
+•	Plugin architecture for new expense categories
+•	Export functionality with different formats
+•	Backup/Restore capabilities
+•	Multi-currency support
+This architecture provides a solid foundation for the Expense Tracker app while maintaining flexibility for future enhancements and ensuring code quality through proper separation of concerns.
+

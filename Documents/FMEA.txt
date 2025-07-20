@@ -1,0 +1,762 @@
+Expense Tracker - Failure Mode and Effects Analysis (FMEA)
+Executive Summary
+This FMEA identifies and prioritizes potential failure modes for the Expense Tracker app, focusing oncritical areas that could impact user experience, data integrity, and app reliability. The analysis covers 25potential failure modes with Risk Priority Numbers (RPN) ranging from 8 to 504.
+Critical Risk Areas (RPN > 200):
+Database corruption leading to data loss
+Memory leaks from unclosed database connections
+Authentication bypass vulnerabilities
+App crashes during expense entry
+FMEA Analysis
+1. DATA PERSISTENCE AND CORRUPTION
+FM-001: Database Corruption
+Description
+: SQLite database becomes corrupted, making data unreadable
+Potential Causes
+:
+App force-closed during write operations
+Storage device failure
+Concurrent write operations without proper locking
+Room migration failures
+Effects
+: Complete data loss, app crashes, inability to add new expenses
+Severity
+: 10 (Complete data loss)
+Occurrence
+: 3 (Rare but possible)
+Detection
+: 7 (May go unnoticed until user reports)
+RPN
+: 210
+Detection Methods
+:
+Database integrity checks on app startup
+Exception monitoring in Room operations
+User feedback on data inconsistencies
+Mitigation
+: Automatic database backup, corruption recovery procedures
+Prevention
+: Write-Ahead Logging (WAL), proper transaction management, graceful shutdownhandling
+FM-002: Data Migration Failure
+Description
+: Room database migration fails during app updates
+Potential Causes
+:
+Incompatible schema changes
+Missing migration scripts
+Insufficient device storage during migration
+Effects
+: App crashes on startup, data loss, user cannot access expenses
+Severity
+: 8 (Significant data loss)
+Occurrence
+: 4 (Moderate - happens during updates)
+Detection
+: 6 (Detected on app startup)
+RPN
+: 192
+Detection Methods
+: Migration testing, crash analytics, startup failure monitoring
+Mitigation
+: Fallback to destructive migration with data export
+Prevention
+: Comprehensive migration testing, incremental migrations, data backup before updates
+FM-003: Transaction Failure
+Description
+: Database transaction fails partially, leaving data in inconsistent state
+Potential Causes
+:
+Storage full during transaction
+App killed mid-transaction
+Concurrent access conflicts
+Effects
+: Duplicate entries, missing data, incorrect totals
+Severity
+: 6 (Data inconsistency)
+Occurrence
+: 5 (Moderate likelihood)
+Detection
+: 4 (May be detected by validation)
+RPN
+: 120
+Detection Methods
+: Data validation checks, transaction monitoring, audit logs
+Mitigation
+: Transaction rollback mechanisms, data consistency checks
+Prevention
+: Atomic transactions, proper error handling, storage space checks
+2. PERFORMANCE ISSUES
+FM-004: Slow Database Queries
+Description
+: Database queries take longer than 500ms requirement
+Potential Causes
+:
+Missing database indexes
+Large dataset without pagination
+Complex joins without optimization
+Background processes consuming resources
+Effects
+: UI freezing, poor user experience, ANR (Application Not Responding)
+Severity
+: 5 (Performance degradation)
+Occurrence
+: 6 (Likely with growing data)
+Detection
+: 3 (Easily measured)
+RPN
+: 90
+Detection Methods
+: Performance monitoring, query execution time tracking, ANR detection
+Mitigation
+: Query optimization, result caching, background processing
+Prevention
+: Proper indexing strategy, pagination, query performance testing
+FM-005: Memory-Intensive Operations
+Description
+: Large expense lists cause memory spikes and potential OOM
+Potential Causes
+:
+Loading entire dataset into memory
+Image attachments not properly managed
+Inefficient data structures
+Effects
+: App crashes, slow scrolling, system slowdown
+Severity
+: 6 (App instability)
+Occurrence
+: 4 (Moderate with large datasets)
+Detection
+: 5 (Memory monitoring required)
+RPN
+: 120
+Detection Methods
+: Memory profiling, OOM crash detection, performance monitoring
+Mitigation
+: Lazy loading, data virtualization, memory cleanup
+Prevention
+: Pagination implementation, efficient data structures, memory testing
+3. MEMORY LEAKS
+FM-006: Unclosed Database Connections
+Description
+: Database connections not properly closed, leading to resource leaks
+Potential Causes
+:
+Missing finally blocks in database operations
+Exceptions preventing connection cleanup
+Improper Flow/Observer lifecycle management
+Effects
+: Gradual memory increase, eventual crashes, degraded performance
+Severity
+: 7 (App instability over time)
+Occurrence
+: 6 (Common without proper cleanup)
+Detection
+: 6 (Requires memory monitoring)
+RPN
+: 252
+Detection Methods
+: Memory leak detection tools (LeakCanary), connection pool monitoring
+Mitigation
+: Automatic connection cleanup, resource monitoring
+Prevention
+: Use-with patterns, proper try-with-resources, automated testing
+FM-007: ViewModel Memory Retention
+Description
+: ViewModels retain references longer than necessary
+Potential Causes
+:
+Static references to ViewModels
+Observers not properly cleared
+Context references in ViewModels
+Effects
+: Memory growth, potential crashes, poor performance
+Severity
+: 5 (Performance impact)
+Occurrence
+: 4 (Moderate with improper implementation)
+Detection
+: 6 (Memory profiling needed)
+RPN
+: 120
+Detection Methods
+: Memory profiling, leak detection tools, lifecycle monitoring
+Mitigation
+: Proper observer cleanup, weak references
+Prevention
+: Follow ViewModel best practices, avoid context references, lifecycle-aware components
+4. UI/UX FAILURES
+FM-008: Compose Recomposition Storms
+Description
+: Excessive recompositions cause UI lag and poor responsiveness
+Potential Causes
+:
+Unstable state objects
+Frequent state changes
+Poor state management design
+Effects
+: Laggy UI, battery drain, poor user experience
+Severity
+: 4 (User experience degradation)
+Occurrence
+: 5 (Common without optimization)
+Detection
+: 4 (UI performance profiling)
+RPN
+: 80
+Detection Methods
+: Compose performance monitoring, recomposition tracking
+Mitigation
+: State optimization, memoization, selective updates
+Prevention
+: Stable state design, performance testing, proper state management
+FM-009: Theme Switching Failures
+Description
+: App crashes or displays incorrectly during theme changes
+Potential Causes
+:
+Resource not found exceptions
+State management issues during theme transition
+Missing theme resources
+Effects
+: App crashes, visual glitches, poor accessibility
+Severity
+: 5 (Functionality loss)
+Occurrence
+: 3 (Less common)
+Detection
+: 5 (Manual testing required)
+RPN
+: 75
+Detection Methods
+: Theme switching testing, crash monitoring, UI testing
+Mitigation
+: Graceful fallbacks, resource validation
+Prevention
+: Comprehensive theme testing, proper resource management
+FM-010: Navigation State Loss
+Description
+: Navigation state is lost, causing users to lose context
+Potential Causes
+:
+Process death during low memory
+Improper state saving
+Navigation component bugs
+Effects
+: User frustration, loss of unsaved data, confusion
+Severity
+: 6 (User experience impact)
+Occurrence
+: 4 (Moderate on low-memory devices)
+Detection
+: 7 (Hard to detect automatically)
+RPN
+: 168
+Detection Methods
+: State persistence testing, process death simulation
+Mitigation
+: Proper state saving/restoration, navigation state management
+Prevention
+: SavedStateHandle usage, navigation testing, state persistence strategy
+5. SECURITY VULNERABILITIES
+FM-011: PIN/Biometric Bypass
+Description
+: Authentication can be bypassed, allowing unauthorized access
+Potential Causes
+:
+Keystore implementation flaws
+Session management bugs
+Background/foreground transition issues
+Effects
+: Unauthorized data access, privacy breach, security compromise
+Severity
+: 9 (Major security breach)
+Occurrence
+: 2 (Low likelihood with proper implementation)
+Detection
+: 7 (Security testing required)
+RPN
+: 126
+Detection Methods
+: Security penetration testing, code review, authentication flow testing
+Mitigation
+: Multi-layer authentication, session timeout
+Prevention
+: Security code review, keystore best practices, regular security testing
+FM-012: Data Storage Vulnerabilities
+Description
+: Sensitive data stored in plaintext or weakly encrypted
+Potential Causes
+:
+Improper encryption implementation
+Database files accessible by other apps
+Debug logs containing sensitive data
+Effects
+: Data exposure, privacy violations, potential financial fraud
+Severity
+: 8 (High security risk)
+Occurrence
+: 3 (Moderate with poor implementation)
+Detection
+: 6 (Security audit required)
+RPN
+: 144
+Detection Methods
+: Security audits, static code analysis, file system inspection
+Mitigation
+: Encryption at rest, secure file permissions
+Prevention
+: Security-first design, encryption best practices, regular audits
+FM-013: Authentication State Persistence
+Description
+: Authentication state inappropriately persisted, creating security gaps
+Potential Causes
+:
+Session tokens stored insecurely
+Authentication state not cleared on logout
+Background app switching vulnerabilities
+Effects
+: Unauthorized access after logout, session hijacking
+Severity
+: 7 (Significant security risk)
+Occurrence
+: 4 (Moderate with improper session management)
+Detection
+: 6 (Security testing needed)
+RPN
+: 168
+Detection Methods
+: Session management testing, security flow validation
+Mitigation
+: Secure session invalidation, timeout mechanisms
+Prevention
+: Proper session lifecycle management, security testing
+6. BATTERY DRAIN
+FM-014: Background Processing
+Description
+: App continues processing in background, draining battery
+Potential Causes
+:
+Unoptimized database queries running continuously
+Background Flow collectors not properly managed
+Unnecessary background operations
+Effects
+: Rapid battery drain, user complaints, app uninstalls
+Severity
+: 4 (User satisfaction impact)
+Occurrence
+: 3 (Less common with offline-first design)
+Detection
+: 5 (Battery monitoring required)
+RPN
+: 60
+Detection Methods
+: Battery usage monitoring, background activity profiling
+Mitigation
+: Proper lifecycle management, background work optimization
+Prevention
+: Offline-first design adherence, lifecycle-aware components
+FM-015: Excessive UI Updates
+Description
+: Too frequent UI updates cause battery drain
+Potential Causes
+:
+Real-time data updates without throttling
+Compose recomposition storms
+Continuous animations or effects
+Effects
+: Battery drain, device heating, poor performance
+Severity
+: 3 (Minor impact)
+Occurrence
+: 4 (Moderate likelihood)
+Detection
+: 4 (Performance monitoring)
+RPN
+: 48
+Detection Methods
+: UI performance monitoring, battery usage analysis
+Mitigation
+: Update throttling, efficient animations
+Prevention
+: Performance-conscious UI design, update optimization
+7. DEVICE COMPATIBILITY
+FM-016: Android Version Incompatibility
+Description
+: App fails on older or newer Android versions
+Potential Causes
+:
+API deprecations
+New security restrictions
+Changed behavior in system components
+Effects
+: Crashes, feature unavailability, poor user experience
+Severity
+: 6 (Platform compatibility issues)
+Occurrence
+: 5 (Common across Android versions)
+Detection
+: 4 (Device testing reveals issues)
+RPN
+: 120
+Detection Methods
+: Multi-version device testing, compatibility monitoring
+Mitigation
+: Version-specific code paths, graceful degradation
+Prevention
+: Comprehensive compatibility testing, conservative API usage
+FM-017: Low Storage Device Issues
+Description
+: App fails when device storage is critically low
+Potential Causes
+:
+Insufficient space for database operations
+Cache files not properly managed
+Large app size on constrained devices
+Effects
+: App crashes, data loss, inability to add expenses
+Severity
+: 7 (Critical functionality loss)
+Occurrence
+: 6 (Common on budget devices)
+Detection
+: 5 (Storage monitoring needed)
+RPN
+: 210
+Detection Methods
+: Storage availability checks, low storage testing
+Mitigation
+: Storage cleanup mechanisms, graceful degradation
+Prevention
+: Efficient storage usage, proactive cleanup, storage monitoring
+FM-018: Hardware Capability Limitations
+Description
+: App performance degrades on low-end hardware
+Potential Causes
+:
+Insufficient RAM for operations
+Slow storage causing timeouts
+CPU limitations affecting UI responsiveness
+Effects
+: Poor performance, timeouts, user frustration
+Severity
+: 5 (Performance degradation)
+Occurrence
+: 6 (Common on target devices)
+Detection
+: 4 (Performance testing reveals)
+RPN
+: 120
+Detection Methods
+: Low-end device testing, performance benchmarking
+Mitigation
+: Performance optimization for low-end devices
+Prevention
+: Target device testing, performance budgets
+8. USER WORKFLOW INTERRUPTIONS
+FM-019: App Crash During Expense Entry
+Description
+: App crashes while user is entering expense data
+Potential Causes
+:
+Memory issues during input
+Database errors during save
+Validation failures causing exceptions
+Effects
+: Data loss, user frustration, workflow interruption
+Severity
+: 8 (Critical user flow failure)
+Occurrence
+: 3 (Moderate likelihood)
+Detection
+: 7 (Crash reporting)
+RPN
+: 168
+Detection Methods
+: Crash analytics, user feedback, testing
+Mitigation
+: Auto-save functionality, crash recovery
+Prevention
+: Robust error handling, input validation, testing
+FM-020: Process Death During Operations
+Description
+: Android kills app process during critical operations
+Potential Causes
+:
+Low memory conditions
+Long-running operations
+System resource pressure
+Effects
+: Lost unsaved data, incomplete operations, user confusion
+Severity
+: 6 (Data loss potential)
+Occurrence
+: 5 (Common on constrained devices)
+Detection
+: 6 (Process death simulation needed)
+RPN
+: 180
+Detection Methods
+: Process death testing, state persistence validation
+Mitigation
+: State persistence, operation resumption
+Prevention
+: Efficient operations, proper state management
+FM-021: Network Permission Requests
+Description
+: App accidentally requests network permissions, confusing users
+Potential Causes
+:
+Third-party libraries requiring network
+Development/debug code left in release
+Dependency updates adding network requirements
+Effects
+: User confusion, privacy concerns, trust issues
+Severity
+: 4 (Trust and privacy concern)
+Occurrence
+: 2 (Low with careful development)
+Detection
+: 5 (Permission auditing needed)
+RPN
+: 40
+Detection Methods
+: Permission auditing, manifest review, dependency analysis
+Mitigation
+: Permission explanation dialogs, opt-out mechanisms
+Prevention
+: Careful dependency management, permission audits
+9. RECOVERY SCENARIOS
+FM-022: Backup/Restore Failures
+Description
+: Data backup or restore operations fail
+Potential Causes
+:
+Corrupted backup data
+Version incompatibilities
+Storage access issues
+Effects
+: Data loss, inability to migrate data, user frustration
+Severity
+: 7 (Significant data impact)
+Occurrence
+: 3 (Moderate during migrations)
+Detection
+: 6 (Backup validation needed)
+RPN
+: 126
+Detection Methods
+: Backup integrity checks, restore testing
+Mitigation
+: Multiple backup formats, validation checks
+Prevention
+: Comprehensive backup testing, format versioning
+FM-023: Database Repair Failures
+Description
+: Automatic database repair attempts fail
+Potential Causes
+:
+Severe corruption beyond repair
+Insufficient storage for repair operations
+Repair algorithm limitations
+Effects
+: Complete data loss, app unusability
+Severity
+: 9 (Complete functionality loss)
+Occurrence
+: 1 (Very rare)
+Detection
+: 8 (Repair process monitoring)
+RPN
+: 72
+Detection Methods
+: Repair operation logging, success rate monitoring
+Mitigation
+: Multiple repair strategies, manual recovery options
+Prevention
+: Proactive corruption prevention, regular integrity checks
+FM-024: Authentication Recovery Issues
+Description
+: User unable to recover access after forgotten PIN/biometric failure
+Potential Causes
+:
+No recovery mechanism implemented
+Biometric hardware failure
+Keystore corruption
+Effects
+: Permanent data loss, app abandonment
+Severity
+: 8 (Complete access loss)
+Occurrence
+: 2 (Rare occurrence)
+Detection
+: 7 (User support needed)
+RPN
+: 112
+Detection Methods
+: User support tickets, authentication failure analytics
+Mitigation
+: Alternative recovery methods, support procedures
+Prevention
+: Multiple authentication options, recovery planning
+FM-025: State Recovery After Crashes
+Description
+: App unable to recover previous state after crashes
+Potential Causes
+:
+Incomplete state persistence
+Corrupted state data
+State restoration bugs
+Effects
+: Lost user progress, data inconsistency, poor UX
+Severity
+: 5 (User experience impact)
+Occurrence
+: 4 (Moderate after crashes)
+Detection
+: 5 (State testing required)
+RPN
+: 100
+Detection Methods
+: Crash recovery testing, state persistence validation
+Mitigation
+: Robust state persistence, graceful recovery
+Prevention
+: Comprehensive state management, recovery testing
+Risk Priority Matrix
+Critical Risks (RPN > 200)
+1.
+FM-006: Unclosed Database Connections
+(RPN: 252)
+2.
+FM-017: Low Storage Device Issues
+(RPN: 210)
+3.
+FM-001: Database Corruption
+(RPN: 210)
+High Risks (RPN 150-200)
+4.
+FM-002: Data Migration Failure
+(RPN: 192)
+5.
+FM-020: Process Death During Operations
+(RPN: 180)
+6.
+FM-010: Navigation State Loss
+(RPN: 168)
+7.
+FM-013: Authentication State Persistence
+(RPN: 168)
+8.
+FM-019: App Crash During Expense Entry
+(RPN: 168)
+Medium Risks (RPN 100-149)
+9.
+FM-012: Data Storage Vulnerabilities
+(RPN: 144)
+10.
+FM-011: PIN/Biometric Bypass
+(RPN: 126)
+11.
+FM-022: Backup/Restore Failures
+(RPN: 126)
+12.
+FM-003: Transaction Failure
+(RPN: 120)
+13.
+FM-005: Memory-Intensive Operations
+(RPN: 120)
+14.
+FM-007: ViewModel Memory Retention
+(RPN: 120)
+15.
+FM-016: Android Version Incompatibility
+(RPN: 120)
+16.
+FM-018: Hardware Capability Limitations
+(RPN: 120)
+17.
+FM-024: Authentication Recovery Issues
+(RPN: 112)
+18.
+FM-025: State Recovery After Crashes
+(RPN: 100)
+Action Plan
+Phase 1: Critical Risk Mitigation (Week 1-2)
+Priority 1: Database Reliability
+Implement Write-Ahead Logging (WAL) for SQLite
+Add database integrity checks on startup
+Create automated backup mechanisms
+Implement graceful database corruption recovery
+Priority 2: Resource Management
+Implement connection pooling with automatic cleanup
+Add LeakCanary integration for memory leak detection
+Create resource monitoring and alerting
+Implement proper Flow lifecycle management
+Priority 3: Storage Management
+Add proactive storage availability checks
+Implement storage cleanup mechanisms
+Create graceful degradation for low storage scenarios
+Add storage usage monitoring
+Phase 2: High Risk Mitigation (Week 3-4)
+Priority 4: State Management
+Implement comprehensive state persistence using SavedStateHandle
+Add process death simulation testing
+Create robust navigation state recovery
+Implement auto-save for critical user inputs
+Priority 5: Security Hardening
+Conduct comprehensive security audit
+Implement multi-layer authentication validation
+Add secure session management
+Create security testing automation
+Phase 3: Medium Risk Mitigation (Week 5-6)
+Priority 6: Compatibility & Performance
+Expand device compatibility testing matrix
+Implement performance optimization for low-end devices
+Create compatibility fallback mechanisms
+Add performance monitoring and alerting
+Priority 7: Recovery Mechanisms
+Implement robust backup/restore functionality
+Create multiple authentication recovery options
+Add comprehensive error recovery procedures
+Develop user support procedures for critical failures
+Phase 4: Monitoring & Validation (Week 7-8)
+Priority 8: Detection Systems
+Implement comprehensive crash analytics
+Add performance monitoring dashboards
+Create automated testing for all failure modes
+Establish user feedback collection systems
+Priority 9: Documentation & Training
+Create failure response procedures
+Document recovery mechanisms
+Train support team on critical failure scenarios
+Establish maintenance procedures
+Monitoring and Validation Strategy
+Automated Detection
+Crash Analytics
+: Firebase Crashlytics or similar
+Performance Monitoring
+: Custom metrics for database operations
+Memory Leak Detection
+: LeakCanary integration
+Battery Usage Tracking
+: System battery API monitoring
+Testing Protocols
+Device Matrix Testing
+: Minimum 10 device configurations
+Stress Testing
+: Large dataset and low memory scenarios
+Security Testing
+: Monthly penetration testing
+Recovery Testing
+: Quarterly disaster recovery drills
+Success Metrics
+Crash Rate
+: < 0.1% of sessions
+Performance
+: 95% of operations complete within 500ms
+Memory Usage
+: No memory leaks detected in 48h testing
+Security
+: Zero authentication bypass incidents
+Recovery
+: 99% successful state recovery after crashes
+This FMEA provides a comprehensive risk management framework for the Expense Tracker app, ensuringrobust operation across all critical failure modes.

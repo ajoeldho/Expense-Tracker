@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker App - UI Mockups</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #1e40af;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #64748b;
+        }
+
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            font-size: 1.5rem;
+            color: #1e40af;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mockup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .phone-mockup {
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+            background: #000;
+            border-radius: 32px;
+            padding: 8px;
+            position: relative;
+        }
+
+        .phone-screen {
+            background: white;
+            border-radius: 24px;
+            height: 640px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .dark-theme .phone-screen {
+            background: #0f0f23;
+            color: #e2e8f0;
+        }
+
+        .status-bar {
+            height: 24px;
+            background: #f8fafc;
+            padding: 0 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .dark-theme .status-bar {
+            background: #1e1e2e;
+            color: #e2e8f0;
+        }
+
+        .app-bar {
+            height: 56px;
+            background: #1e40af;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            font-weight: 500;
+            font-size: 18px;
+        }
+
+        .content {
+            padding: 16px;
+            height: calc(640px - 80px);
+            overflow-y: auto;
+        }
+
+        .fab {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: #1e40af;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        }
+
+        .expense-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid #1e40af;
+        }
+
+        .dark-theme .expense-card {
+            background: #2d2d48;
+            border-left-color: #60a5fa;
+        }
+
+        .expense-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .expense-amount {
+            font-size: 18px;
+            font-weight: 600;
+            color: #dc2626;
+        }
+
+        .expense-category {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .dark-theme .expense-category {
+            background: #1e3a8a;
+            color: #93c5fd;
+        }
+
+        .expense-note {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .summary-amount {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .summary-period {
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .form-field {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .dark-theme .form-label {
+            color: #e2e8f0;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .form-input:focus {
+            border-color: #1e40af;
+            outline: none;
+        }
+
+        .dark-theme .form-input {
+            background: #374151;
+            border-color: #4b5563;
+            color: #e2e8f0;
+        }
+
+        .button {
+            background: #1e40af;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .button:hover {
+            background: #1e3a8a;
+        }
+
+        .tab-bar {
+            display: flex;
+            background: #f8fafc;
+            border-top: 1px solid #e5e7eb;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+        }
+
+        .dark-theme .tab-bar {
+            background: #1e1e2e;
+            border-top-color: #374151;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .tab-item.active {
+            color: #1e40af;
+        }
+
+        .dark-theme .tab-item.active {
+            color: #60a5fa;
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .dark-theme .settings-item {
+            border-bottom-color: #374151;
+        }
+
+        .toggle {
+            width: 48px;
+            height: 24px;
+            background: #e5e7eb;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .toggle.active {
+            background: #1e40af;
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        .toggle.active::after {
+            transform: translateX(24px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: #64748b;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .pin-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 32px 0;
+        }
+
+        .pin-key {
+            aspect-ratio: 1;
+            background: #f8fafc;
+            border: 2px solid #e5e7eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .dark-theme .pin-key {
+            background: #374151;
+            border-color: #4b5563;
+            color: #e2e8f0;
+        }
+
+        .chart-placeholder {
+            height: 200px;
+            background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+
+        .legend {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 1rem;
+        }
+
+        .legend h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #374151;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .nav-flow {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .nav-box {
+            background: #e0f2fe;
+            border: 2px solid #0369a1;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 500;
+            color: #0369a1;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .nav-arrow {
+            color: #64748b;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .mockup-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Expense Tracker App</h1>
+            <p>Complete UI/UX Design System & Mockups - Material Design 3</p>
+        </div>
+
+        <!-- Information Architecture -->
+        <div class="section">
+            <h2>📋 Information Architecture & Navigation Flow</h2>
+            <div class="nav-flow">
+                <div class="nav-box">Lock Screen</div>
+                <div class="nav-arrow">→</div>
+                <div class="nav-box">Home Dashboard</div>
+                <div class="nav-arrow">→</div>
+                <div class="nav-box">Add Expense</div>
+            </div>
+            <div class="nav-flow">
+                <div class="nav-box">Home Dashboard</div>
+                <div class="nav-arrow">→</div>
+                <div class="nav-box">Expense List</div>
+                <div class="nav-arrow">→</div>
+                <div class="nav-box">Edit Expense</div>
+            </div>
+            <div class="nav-flow">
+                <div class="nav-box">Home Dashboard</div>
+                <div class="nav-arrow">→</div>
+                <div class="nav-box">Settings</div>
+                <div class="nav-arrow">→</div>
+                <div class="nav-box">Theme/Security</div>
+            </div>
+            
+            <div class="legend">
+                <h3>🗂️ Screen Hierarchy</h3>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #1e40af;"></div>
+                    <span><strong>Primary Screens:</strong> Home, Add Expense, Expense List, Settings</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #3b82f6;"></div>
+                    <span><strong>Secondary Screens:</strong> Edit Expense, Theme Settings, Security Setup</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #60a5fa;"></div>
+                    <span><strong>Utility Screens:</strong> PIN Lock, Empty States, Error States</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Home Screen Mockups -->
+        <div class="section">
+            <h2>🏠 Home Dashboard - Light & Dark Theme</h2>
+            <div class="mockup-grid">
+                <!-- Light Theme Home -->
+                <div>
+                    <h3 style="text-align: center; margin-bottom: 1rem; color: #1e40af;">Light Theme</h3>
+                    <div class="phone-mockup">
+                        <div class="phone-screen">
+                            <div class="status-bar">
+                                <span>9:41</span>
+                                <span>🔋 85%</span>
+                            </div>
+                            <div class="app-bar">
+                                <span>💰 Expense Tracker</span>
+                            </div>
+                            <div class="content">
+                                <div class="summary-card">
+                                    <div class="summary-amount">₹2,450</div>
+                                    <div class="summary-period">Today's Expenses</div>
+                                </div>
+                                
+                                <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+                                    <div style="flex: 1; text-align: center; padding: 12px; background: #f8fafc; border-radius: 8px;">
+                                        <div style="font-size: 16px; font-weight: 600; color: #dc2626;">₹8,750</div>
+                                        <div style="font-size: 12px; color: #64748b;">This Week</div>
+                                    </div>
+                                    <div style="flex: 1; text-align: center; padding: 12px; background: #f8fafc; border-radius: 8px;">
+                                        <div style="font-size: 16px; font-weight: 600; color: #dc2626;">₹32,100</div>
+                                        <div style="font-size: 12px; color: #64748b;">This Month</div>
+                                    </div>
+                                </div>
+
+                                <h3 style="margin-bottom: 12px; font-size: 16px;">Recent Expenses</h3>
+                                
+                                <div class="expense-card">
+                                    <div class="expense-header">
+                                        <div class="expense-amount">-₹350</div>
+                                        <div class="expense-category">🍕 Food</div>
+                                    </div>
+                                    <div class="expense-note">Lunch at office cafeteria</div>
+                                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Today, 1:30 PM</div>
+                                </div>
+
+                                <div class="expense-card">
+                                    <div class="expense-header">
+                                        <div class="expense-amount">-₹85</div>
+                                        <div class="expense-category">🚗 Transport</div>
+                                    </div>
+                                    <div class="expense-note">Auto to metro station</div>
+                                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Today, 9:15 AM</div>
+                                </div>
+
+                                <div class="expense-card">
+                                    <div class="expense-header">
+                                        <div class="expense-amount">-₹1,200</div>
+                                        <div class="expense-category">🛒 Shopping</div>
+                                    </div>
+                                    <div class="expense-note">Grocery shopping</div>
+                                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Yesterday, 7:45 PM</div>
+                                </div>
+                            </div>
+                            <div class="fab">+</div>
+                            <div class="tab-bar">
+                                <div class="tab-item active">
+                                    <div style="font-size: 20px; margin-bottom: 4px;">🏠</div>
+                                    <div>Home</div>
+                                </div>
+                                <div class="tab-item">
+                                    <div style="font-size: 20px; margin-bottom: 4px;">📊</div>
+                                    <div>Analytics</div>
+                                </div>
+                                <div class="tab-item">
+                                    <div style="font-size: 20px; margin-bottom: 4px;">📝</div>
+                                    <div>Expenses</div>
+                                </div>
+                                <div class="tab-item">
+                                    <div style="font-size: 20px; margin-bottom: 4px;">⚙️</div>
+                                    <div>Settings</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dark Theme Home -->
+                <div class="dark-theme">
+                    <h3 style="text-align: center; margin-bottom: 1rem; color: #60a5fa;">Dark Theme</h3>
+                    <div class="phone-mockup">
+                        <div class="phone-screen">
+                            <div class="status-bar">
+                                <span>9:41</span>
+                                <span>🔋 85%</span>
+                            </div>
+                            <div class="app-bar" style="background: #1e1e2e;">
+                                <span>💰 Expense Tracker</span>
+                            </div>
+                            <div class="content">
+                                <div class="summary-card" style="background: linear-gradient(135deg, #2563eb, #3b82f6);">
+                                    <div class="summary-amount">₹2,450</div>
+                                    <div class="summary-period">Today's Expenses</div>
+                                </div>
+                                
+                                <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+                                    <div style="flex: 1; text-align: center; padding: 12px; background: #2d2d48; border-radius: 8px;">
+                                        <div style="font-size: 16px; font-weight: 600; color: #fca5a5;">₹8,750</div>
+                                        <div style="font-size: 12px; color: #94a3b8;">This Week</div>
+                                    </div>
+                                    <div style="flex: 1; text-align: center; padding: 12px; background: #2d2d48; border-radius: 8px;">
+                                        <div style="font-size: 16px; font-weight: 600; color: #fca5a5;">₹32,100</div>
+                                        <div style="font-size: 12px; color: #94a3b8;">This Month</div>
+                                    </div>
+                                </div>
+
+                                <h3 style="margin-bottom: 12px; font-size: 16px; color: #e2e8f0;">Recent Expenses</h3>
+                                
+                                <div class="expense-card">
+                                    <div class="expense-header">
+                                        <div class="expense-amount" style="color: #fca5a5;">-₹350</div>
+                                        <div class="expense-category">🍕 Food</div>
+                                    </div>
+                                    <div class="expense-note" style="color: #94a3b8;">Lunch at office cafeteria</div>
+                                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Today, 1:30 PM</div>
+                                </div>
+
+                                <div class="expense-card">
+                                    <div class="expense-header">
+                                        <div class="expense-amount" style="color: #fca5a5;">-₹85</div>
+                                        <div class="expense-category">🚗 Transport</div>
+                                    </div>
+                                    <div class="expense-note" style="color: #94a3b8;">Auto to metro station</div>
+                                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Today, 9:15 AM</div>
+                                </div>
+                            </div>
+                            <div class="fab" style="background: #2563eb;">+</div>
+                            <div class="tab-bar">
+                                <div class="tab-item active">
+                                    <div style="font-size: 20px; margin-bottom: 4px;">🏠</div>
+                                    <div>Home</div>
+                                </div>
+                                <div class="tab-item">
+                                    <div style="font-size: 20px; margin-bottom: 4px;">📊</div>
+                                    <div>Analytics</div>
+                                </div>
+                                <div class="tab-item">
+                                    <div style="font-size: 20px; margin-bottom: 4px;">📝</div>
+                                    <div>Expenses</div>
+                                </div>
+                                <div class="tab-item">
+                                    <div style="font-size: 20px; margin-bottom: 4px;">⚙️</div>
+                                    <div>Settings</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Expense Screen -->
+        <div class="section">
+            <h2>➕ Add/Edit Expense Screen</h2>
+            <div class="mockup-grid">
+                <div>
+                    <h3 style="text-align: center; margin-bottom: 1rem; color: #1e40af;">Add New Expense</h3>
+                    <div class="phone-mockup">
+                        <div class="phone-screen">
+                            <div class="status-bar">
+                                <span>9:41</span>
+                                <span>🔋 85%</span>
+                            </div>
+                            <div class="app-bar">
+                                <span>← Add Expense</span>
+                            </div>
+                            <div class="content">
+                                <div class="form-field">
+                                    <label class="form-label">💰 Amount *</label>
+                                    <input type="number" class="form-input" placeholder="Enter amount" value="350">
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-label">🏷️ Category *</label>
+                                    <select class="form-input">
+                                        <option>🍕 Food & Dining</option>
+                                        <option>🚗 Transportation</option>
+                                        <option>🛒 Shopping</option>
+                                        <option>💡 Bills & Utilities</option>
+                                        <option>🎬 Entertainment</option>
+                                        <option>🏥 Healthcare</option>
+                                        <option>📚 Education</option>
+                                        <option>🎁 Gifts</option>
+                                        <option>✈️ Travel</option>
+                                        <option>📱 Others</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-label">📝 Note (Optional)</label>
+                                    <input type="text" class="form-input" placeholder="What did you buy?" value="Lunch at office cafeteria">
+                                </div>
+
+                                <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                                    <div style="flex: 1;">
+                                        <label class="form-label">📅 Date</label>
+                                        <input type="date" class="form-input" value="2025-07-20">
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <label class="form-label">🕒 Time</label>
+                                        <input type="time" class="form-input" value="13:30">
+                                    </div>
+                                </div>
+
+                                <button class="button" style="margin-bottom: 12px;">Save Expense</button>
+                                <button class="button" style="background: #dc2626;">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="text-align: center; margin-bottom: 1rem; color: #dc2626;">Edit Expense</h3>
+                    <div class="phone-mockup">
+                        <div class="phone-screen">
+                            <div class="status-bar">
+                                <span>9:41</span>
+                                <span>🔋 85%</span>
+                            </div>
+                            <div class="app-bar">
+                                <span>← Edit Expense</span>
+                            </div>
+                            <div class="content">
+                                <div class="form-field">
+                                    <label class="form-label">💰 Amount *</label>
+                                    <input type="number" class="form-input" value="350">
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-label">🏷️ Category *</label>
+                                    <select class="form-input">
+                                        <option selected>🍕 Food & Dining</option>
+                                        <option>🚗 Transportation</option>
+                                        <option>🛒 Shopping</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-label">📝 Note</label>
+                                    <input type="text" class="form-input" value="Lunch at office cafeteria">
+                                </div>
+
+                                <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                                    <div style="flex: 1;">
+                                        <label class="form-label">📅 Date</label>
+                                        <input type="date" class="form-input" value="2025-07-20">
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <label class="form-label">🕒 Time</label>
+                                        <input type="time" class="form-input" value="13:30">
+                                    </div>
+                                </div>
+
+                                <button class="button" style="margin-bottom: 12px;">Update Expense</button>
+                                <button class="button" style="background: #dc2626; margin-bottom: 12px;">Delete Expense</button>
+                                <button class="button" style="background: #6b7280;">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expense List Screen -->
+        <div class="section">
+            <h2>📝 Expense List & Analytics Screen</h2>
+            <div class="mockup-grid">
+                <div>
+                    <h3 style="text-align: center; margin-bottom: 1rem; color: #1e40af;">Expense History</h3>
+                    <div class="phone-mockup">
+                        <div class="phone-screen">
+                            <div class="status-bar">
+                                <span>9:41</span>
+                                <span>🔋 85%</span>
+                            </div>
+                            <div class="app-bar">
+                                <span>📝 All Expenses</span>
+                            </div>
+                            <div class="content">
+                                <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                                    <button style="flex: 1; padding: 8px; background: #1e40af; color: white; border: none; border-radius: 6px;">Today</button>
+                                    <button style="flex: 1; padding: 8px; background: #f3f4f6; border: none; border-radius: 6px;">Week</button>
+                                    <button style="flex: 1; padding: 8px; background: #f3f4f6; border: none; border-radius: 6px;">Month</button>
+                                </div>
+
+                                <div style="background: #1e40af; color: white; border-radius: 8px; padding: 12px; margin-bottom: 16px; text-align: center;">
+                                    <div style="font-size: 20px; font-weight: 600;">₹2,450</div>
+                                    <div style="opacity: 0.8;">Total Today</div>
+                                </div>

@@ -1,0 +1,222 @@
+Expense Tracker - Architectural Decision Records
+ADR-001: Choice of Jetpack Compose over Traditional Views
+Status: Accepted
+Context: The Expense Tracker app requires a modern, maintainable UI framework that supports Material Design 3, theme switching (dark/light), and accessibility features like TalkBack. The team needs to choose between traditional Android Views (XML layouts) and Jetpack Compose for the UI implementation.
+Decision: We will use Jetpack Compose as the primary UI framework for all screens and components.
+Consequences:
+Positive:
+•	Declarative UI paradigm reduces boilerplate code and improves maintainability
+•	Built-in support for Material Design 3 components and theming
+•	Excellent state management integration with ViewModels
+•	Better performance for dynamic UI updates (expense list updates, theme switching)
+•	Type-safe navigation and better testing capabilities
+•	Simplified theme switching implementation
+•	Better accessibility support out of the box
+Negative:
+•	Steeper learning curve for developers unfamiliar with Compose
+•	Larger APK size compared to traditional Views (though still within 20MB constraint)
+•	Some advanced customizations may require more effort initially
+Alternatives Considered:
+•	Traditional XML Views with Data Binding: Rejected due to increased complexity for theme switching and state management
+•	Hybrid approach (mixing Views and Compose): Rejected to maintain consistency and avoid integration complexity
+________________________________________
+ADR-002: Room DB for Local Storage vs Alternatives
+Status: Accepted
+Context: The app requires offline-first data persistence with requirements for storing expenses, categories, and settings. Performance requirements specify operations completing within 500ms, and the app must support up to 10MB of local data storage.
+Decision: We will use Room Database with SQLite as the underlying storage mechanism for all persistent data.
+Consequences:
+Positive:
+•	Type-safe database operations with compile-time verification
+•	Excellent integration with Kotlin Coroutines and Flow for reactive data streams
+•	Built-in migration support for future schema changes
+•	Indexing capabilities for performance optimization on timestamp and categoryId columns
+•	Mature ecosystem with extensive documentation and community support
+•	Meets performance requirements with proper indexing
+Negative:
+•	Slightly more setup overhead compared to simpler alternatives
+•	Learning curve for SQL and Room annotations
+•	Limited to relational data model
+Alternatives Considered:
+•	SharedPreferences: Rejected due to poor performance for complex data and lack of querying capabilities
+•	Raw SQLite: Rejected due to increased boilerplate and lack of type safety
+•	NoSQL solutions (Realm, etc.): Rejected to minimize dependencies and maintain simplicity
+________________________________________
+ADR-003: Repository Pattern Implementation
+Status: Accepted
+Context: The Clean Architecture design requires a clear separation between data sources and business logic. The app needs to support future extensibility (export functionality, backup/restore) while maintaining testability.
+Decision: We will implement the Repository pattern with interface-based abstractions in the domain layer and concrete implementations in the data layer.
+Consequences:
+Positive:
+•	Clear separation of concerns following Clean Architecture principles
+•	Easy to mock for unit testing of use cases and ViewModels
+•	Flexibility to add new data sources (export, backup) without changing business logic
+•	Centralized data access logic with consistent error handling
+•	Support for Result pattern for robust error propagation
+Negative:
+•	Additional abstraction layer increases initial development time
+•	More files and interfaces to maintain
+•	Potential over-engineering for simple CRUD operations
+Alternatives Considered:
+•	Direct DAO access from ViewModels: Rejected due to tight coupling and poor testability
+•	Generic Repository: Rejected due to complexity and violation of Interface Segregation Principle
+•	Data Source pattern without Repository: Rejected due to lack of business logic centralization
+________________________________________
+ADR-004: Dependency Injection Framework Selection
+Status: Accepted
+Context: The app requires dependency injection for managing database instances, repositories, use cases, and ViewModels. The solution must be lightweight, performant, and integrate well with Android architecture components.
+Decision: We will use Hilt (Dagger-Hilt) for dependency injection throughout the application.
+Consequences:
+Positive:
+•	Built specifically for Android with excellent lifecycle integration
+•	Compile-time dependency resolution for better performance
+•	Automatic ViewModel injection support
+•	Clear module organization with @InstallIn annotations
+•	Excellent integration with testing frameworks
+•	Reduces boilerplate compared to manual DI
+Negative:
+•	Build time increase due to annotation processing
+•	Learning curve for Hilt-specific annotations
+•	Potential over-engineering for a simple app
+Alternatives Considered:
+•	Manual Dependency Injection: Rejected due to increased boilerplate and error-prone nature
+•	Koin: Rejected due to runtime dependency resolution and reflection usage
+•	Dagger 2: Rejected due to complexity and Android-specific setup requirements
+________________________________________
+ADR-005: Navigation Architecture Approach
+Status: Accepted
+Context: The app requires navigation between 5 main screens (Home, Add/Edit Expense, Expense List, Settings, Auth) with type-safe parameter passing and proper state management during navigation.
+Decision: We will use Jetpack Navigation Compose for handling all navigation within the application.
+Consequences:
+Positive:
+•	Type-safe navigation with compile-time verification
+•	Excellent integration with Compose UI
+•	Built-in support for animation transitions
+•	Proper handling of system back button and deep links
+•	Centralized navigation logic
+•	Support for nested navigation graphs for future modularization
+Negative:
+•	Limited customization options for complex navigation patterns
+•	Learning curve for Navigation Compose API
+•	Potential memory retention issues if not properly managed
+Alternatives Considered:
+•	Manual navigation with Compose: Rejected due to increased complexity and lack of type safety
+•	Third-party navigation libraries: Rejected to minimize dependencies
+•	Activity-based navigation: Rejected due to performance overhead and complexity
+________________________________________
+ADR-006: State Management Strategy
+Status: Accepted
+Context: The app requires reactive state management for UI updates, data synchronization between screens, and handling loading/error states. Performance requirements specify UI transitions within 500ms.
+Decision: We will use a combination of ViewModel with StateFlow/Flow and Compose's state management (remember, mutableStateOf) for UI state management.
+Consequences:
+Positive:
+•	Reactive data streams with Flow provide automatic UI updates
+•	Clear separation between UI state and business state
+•	Excellent performance with minimal recompositions
+•	Built-in lifecycle awareness prevents memory leaks
+•	Type-safe state representation with data classes
+•	Easy testing of state transitions
+Negative:
+•	Complexity in managing multiple state sources
+•	Potential for state inconsistencies if not properly managed
+•	Learning curve for Flow operators and StateFlow
+Alternatives Considered:
+•	LiveData: Rejected due to lack of first-class Compose support
+•	MVI with Redux-like pattern: Rejected as over-engineering for app complexity
+•	Direct database observation in Compose: Rejected due to poor separation of concerns
+________________________________________
+ADR-007: Testing Strategy (Unit, Integration, UI Tests)
+Status: Accepted
+Context: The app requires comprehensive testing coverage to ensure reliability, especially for financial data handling. Testing must cover business logic, data operations, and UI interactions while maintaining fast execution times.
+Decision: We will implement a three-tier testing strategy: Unit tests for domain layer and ViewModels, Integration tests for repository implementations and database operations, and UI tests for critical user flows using Compose testing framework.
+Consequences:
+Positive:
+•	High confidence in business logic correctness through isolated unit tests
+•	Database operations validated through integration tests
+•	Critical user flows protected by UI tests
+•	Fast feedback cycle with predominantly unit tests
+•	Easy mocking with Repository pattern and dependency injection
+•	Automated regression prevention
+Negative:
+•	Increased development time for comprehensive test coverage
+•	Maintenance overhead for test suites
+•	Potential for test brittleness in UI tests
+Alternatives Considered:
+•	Only UI tests: Rejected due to slow execution and poor failure isolation
+•	Only unit tests: Rejected due to lack of integration validation
+•	Manual testing only: Rejected due to reliability concerns and regression risk
+________________________________________
+ADR-008: Package Structure and Modularization
+Status: Accepted
+Context: The app needs a clear package structure that supports Clean Architecture principles and future modularization. The structure must be intuitive for new developers while supporting the planned feature modules (:expense, :settings, :auth).
+Decision: We will use a layered package structure within a single module initially, organized by architectural layers (presentation, domain, data) with feature-based sub-packages, and a clear migration path to multi-module architecture.
+Consequences:
+Positive:
+•	Clear architectural boundaries enforced by package structure
+•	Easy to locate and modify related functionality
+•	Supports future extraction into feature modules
+•	Consistent with Clean Architecture principles
+•	Facilitates parallel development by different team members
+Negative:
+•	Initial over-organization for a simple app
+•	Potential package proliferation as features grow
+•	Risk of circular dependencies if not carefully managed
+Alternatives Considered:
+•	Feature-first packaging: Rejected due to blurred architectural boundaries
+•	Flat package structure: Rejected due to poor scalability and organization
+•	Immediate multi-module structure: Rejected due to over-engineering for MVP
+________________________________________
+ADR-009: Offline-First Architecture Approach
+Status: Accepted
+Context: The SRS explicitly requires the app to function completely offline with no network dependencies. Users include those with intermittent connectivity and low-end devices. The app must never make background network requests.
+Decision: We will implement a strict offline-first architecture where all functionality works without network connectivity, with no cloud sync, external API calls, or network permission requests.
+Consequences:
+Positive:
+•	Guaranteed functionality regardless of network connectivity
+•	Improved privacy and security with no external data transmission
+•	Better performance without network latency
+•	Lower battery usage (no network operations)
+•	Simplified architecture without network error handling
+•	Meets target user needs (students, gig workers with limited connectivity)
+Negative:
+•	No data backup or sync across devices
+•	Limited functionality expansion requiring external services
+•	No collaborative features or sharing capabilities
+•	Data loss risk if device is damaged or replaced
+Alternatives Considered:
+•	Offline-first with optional cloud sync: Rejected due to SRS requirements and complexity
+•	Online-only with caching: Rejected due to connectivity requirements
+•	Hybrid approach: Rejected due to added complexity and partial functionality
+________________________________________
+ADR-010: Theme Switching Implementation
+Status: Accepted
+Context: The app must support both dark and light themes with ability to follow system settings or manual override. Theme switching must be immediate without app restart and persist across sessions.
+Decision: We will implement theme switching using Compose's Material Theme with dynamic theme selection based on user preference stored in DataStore, with immediate UI updates through state management.
+Consequences:
+Positive:
+•	Seamless theme switching without app restart
+•	Automatic system theme detection and following
+•	Persistent user preference across app sessions
+•	Built-in Material Design 3 color schemes
+•	Excellent accessibility support with proper contrast ratios
+•	Easy to extend with additional themes in the future
+Negative:
+•	Additional complexity in state management for theme preference
+•	Potential flash during theme transitions if not properly implemented
+•	Need to test all screens in both themes
+Alternatives Considered:
+•	Activity recreation for theme change: Rejected due to poor user experience
+•	Manual theme implementation: Rejected due to maintenance overhead and accessibility concerns
+•	CSS-like theme switching: Rejected as not applicable to Android native development
+________________________________________
+Implementation Priority
+Based on the architecture design and SRS requirements, the recommended implementation order is:
+1.	ADR-002, ADR-004: Set up Room DB and Hilt for foundational data and DI
+2.	ADR-008: Establish package structure and clean architecture layers
+3.	ADR-003: Implement Repository pattern and domain models
+4.	ADR-006, ADR-001: Implement state management and basic Compose UI
+5.	ADR-005: Add navigation between screens
+6.	ADR-010: Implement theme switching
+7.	ADR-009: Validate offline-first requirements
+8.	ADR-007: Add comprehensive testing coverage
+These ADRs provide a solid foundation for building a maintainable, performant, and user-focused Expense Tracker application that meets all specified requirements.
+
